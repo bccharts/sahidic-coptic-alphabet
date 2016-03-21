@@ -1,0 +1,127 @@
+# Sahidic Coptic Alphabet graded worksheet
+# by Ben Crowder, bencrowder.net
+# Last modified 21 March 2016
+
+# Uses PlotDevice (plotdevice.io)
+
+import math
+
+# Page size and margins (in points)
+PAGE_WIDTH = 612
+PAGE_HEIGHT = 792
+MARGIN = 40
+
+# General layout
+MAX_WIDTH = PAGE_WIDTH - (MARGIN * 2) - 1
+NUM_ROWS = 15
+ROW_SPACING = 46.5
+BASE_TRACKING = 50
+
+# Font size
+GLYPH_SIZE = 21
+
+# Offsets
+BASE_Y = 40
+
+
+# Set up the page
+size(PAGE_WIDTH, PAGE_HEIGHT)
+background(1)
+
+# Read in the glyphs
+with open('graded-alphabet.list', 'r') as f:
+    glyphs = f.read().split(' ')
+
+
+def draw_header():
+    """ Draw the header. """
+
+    font("Charis SIL", size=14, tracking=-15)
+    text("Sahidic Coptic Alphabet Graded Worksheet", MARGIN, 43)
+    stroke(0)
+    pen(0.25)
+    line(40, 50, 572, 50)
+    
+    fill(0.5)
+    font(size=9, italic=True, sc=False, tracking=0)
+    align(RIGHT)
+    text("bencrowder.net — Last modified 21 March 2016", PAGE_WIDTH - MARGIN, MARGIN + 4)
+    
+    fill(1)
+    font(italic=False)    
+    align(LEFT)
+
+def draw_row(row, x, y, tracking=0):
+    """ Draw each row of glyphs. """
+
+    push()
+    translate(x, y)
+
+    fill(0)
+    font(tracking=tracking)
+    text(row, 0, 0)
+    pen(0.2)
+    line(0, GLYPH_SIZE + 1, PAGE_WIDTH - (MARGIN * 2), GLYPH_SIZE + 1)
+
+    pop()
+
+def get_row(max_width):
+    """ Get a row of glyphs (as many as we can fit onto a line). """
+
+    # Set up initial tracking level
+    tracking = BASE_TRACKING
+    font(tracking=tracking)
+    
+    # Build the string
+    string = []
+    width = 0
+    while width < MAX_WIDTH:
+        if len(glyphs) > 0:
+            string.append(glyphs.pop(0))
+        else:
+            break
+        
+        # Calculate width of string
+        width = textwidth(' '.join(string))
+    
+    # Final check
+    if width > max_width:
+        # Put it back on the glyphs list
+        glyphs.insert(0, string[-1])
+        
+        # And pull it from this row
+        string = string[0:-1]
+    
+    # Create the final string
+    final_string = ' '.join(string)
+    
+    # Set tracking, for full justification
+    if len(final_string) > 30: # Skip for short lines
+        while textwidth(final_string) < max_width:
+            tracking += 0.5
+            font(tracking=tracking)
+    
+    return (final_string, tracking)
+
+
+
+# Draw the header
+draw_header()
+
+# Glyph font
+font("Antinoou", size=GLYPH_SIZE, weight="Bold")
+y = 0
+
+# Draw each row
+while len(glyphs) > 0 and y < NUM_ROWS:
+    # Get the row of glyphs
+    row, tracking = get_row(MAX_WIDTH)
+
+    # Draw it
+    draw_row(row, MARGIN, (y * ROW_SPACING) + (MARGIN + BASE_Y), tracking)
+
+    # Offset
+    y += 1
+    
+# Save to PDF
+export('sahidic-coptic-alphabet-graded-worksheet.pdf')

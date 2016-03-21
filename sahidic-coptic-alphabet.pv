@@ -1,0 +1,127 @@
+# Sahidic Coptic Alphabet chart
+# by Ben Crowder, bencrowder.net
+# Last modified 21 March 2016
+
+# Uses PlotDevice (plotdevice.io)
+
+import re
+import yaml
+
+# Page size and margins (in points)
+PAGE_WIDTH = 792
+PAGE_HEIGHT = 612
+MARGIN = 35
+
+# Column sizes and spacing
+COLUMN_WIDTH = 150
+CHARS_PER_COL = 6
+VERTICAL_SPACING = 88
+
+# Font sizes
+CHAR_SIZE = 50        # Size of the character
+TRANSLIT_SIZE = 16    # Size of the transliterations
+NAME_SIZE = 8         # Size of the character name (in red)
+
+# Offsets
+LETTER_START_Y = 110  # Where to start drawing letters
+INFO_X = 60           # X offset for transliteration/name
+TRANSLIT_Y = -17      # How much to offset the transliteration
+NAME_Y = -4           # How much to offset the character name
+LINE_OFFSET = -29     # X offset for the vertical lines
+
+
+# Set up the page
+size(PAGE_WIDTH, PAGE_HEIGHT)
+background(1)
+
+# Load the data
+with open("sahidic-coptic-alphabet.yaml", "r") as f:
+    data = yaml.load(f.read())
+
+
+def draw_header():
+    """ Draw the header at the top. """
+    
+    font("Charis SIL", size=16, tracking=-15)
+    text(data['label'], MARGIN, MARGIN + 10)
+    
+    align(RIGHT)
+    font(size=9, sc=False, italic=True, tracking=0)
+    stroke(0)
+    fill(0.5)
+    text("bencrowder.net — Last modified {}".format(data['updated']), PAGE_WIDTH - MARGIN, MARGIN + 10)
+    font(italic=False)
+    
+    align(LEFT)
+    pen(0.5)
+
+def chunks(l, n):
+    """ Yield successive n-sized chunks from l """
+    for i in xrange(0, len(l), n):
+        yield l[i:i+n]
+        
+def draw_column(chars, x, y, draw_line=False):
+    """ Draw a column of characters. """
+
+    push()
+    translate(x, y)
+
+    # The vertical line to the left of the column
+    if draw_line:    
+        pen(0.25)
+        stroke(0.5)
+        line(LINE_OFFSET, -36, LINE_OFFSET, PAGE_HEIGHT - (MARGIN * 4.3))
+    
+    for char in chars:
+        # The main character
+        font(sc=False)
+        font("Antinoou", size=CHAR_SIZE, weight="regular", italic=False, tracking=0)
+        fill(0)
+        text(char['character'], 0, 0)
+        
+        # Transliteration (e.g., "a")
+        font("Charis SIL", size=TRANSLIT_SIZE, tracking=-5)
+        text(INFO_X, TRANSLIT_Y, xml=char['transliteration'])
+        
+        # Name (e.g., "alpha")
+        font(italic=False, size=NAME_SIZE, sc=True, tracking=70)
+        fill("#be2f09")
+        text(char['name'], INFO_X, NAME_Y)
+        
+        # Move down for the next character
+        translate(0, VERTICAL_SPACING)
+
+    pop()
+
+def parse_list(letters):
+    """ Parses the YAML file into a list of dictionaries. """
+    
+    response = []
+    
+    for line in letters:
+        data = line.split('|')
+        
+        group = {
+            'character': data[0].strip(),
+            'name': data[1].strip(),
+            'transliteration': data[2].strip(),
+        }
+        
+        response.append(group)
+    
+    return response
+
+
+
+# Draw the header
+draw_header()
+
+# Chunk the character list into columns
+char_list = chunks(parse_list(data['letters']), CHARS_PER_COL)
+
+# Draw each column
+for i, col in enumerate(char_list):
+    draw_column(col, (i * COLUMN_WIDTH) + MARGIN, LETTER_START_Y, i)
+
+# Save to PDF (filename specified in the YAML file)
+export(data['output'])

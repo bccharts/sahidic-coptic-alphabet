@@ -1,0 +1,34 @@
+label: Sahidic Coptic Alphabet
+output: 'sahidic-coptic-alphabet.pdf'
+updated: 21 March 2016
+letters:
+  - Ⲁ | alpha | a
+  - Ⲃ | beta | b
+  - Ⲅ | gamma | g
+  - Ⲇ | delta | d
+  - Ⲉ | ei | e
+  - Ⲍ | zēta | z
+  - Ⲏ | ēta | ē
+  - Ⲑ | thēta | th
+  - Ⲓ | yota | i
+  - Ⲕ | kabba | k
+  - Ⲗ | lola | l
+  - Ⲙ | me | m
+  - Ⲛ | ne | n
+  - Ⲝ | eksi | ks
+  - Ⲟ | o | o
+  - Ⲡ | pi | p
+  - Ⲣ | ro | r
+  - Ⲥ | sima | s
+  - Ⲧ | taw | t
+  - Ⲩ | epsilon | u
+  - Ⲫ | fi | ph
+  - Ⲭ | khe | kh
+  - Ⲯ | epsi | ps
+  - Ⲱ | ōu | ō
+  - Ϣ | shay | sh
+  - Ϥ | fay | f
+  - Ϩ | hōri | h
+  - Ϫ | janja | j
+  - Ϭ | tshēma | tsh
+  - Ϯ | ti | ti
